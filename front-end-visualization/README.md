@@ -6,7 +6,7 @@ Highcharts react docs: https://github.com/highcharts/highcharts-react#options-de
 
 ## Getting Started
 
-In the project directory, you can run:
+Use `yarn` to install dependencies, then:
 
 ### `yarn start`
 

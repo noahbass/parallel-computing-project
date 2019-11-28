@@ -2,7 +2,7 @@
 
 ## Front-End
 
-See [front-end-visualization/README.md](front-end-visualization/README.md) for getting started with the front-end (`yarn start`).
+See [front-end-visualization/](front-end-visualization/) for getting started with the front-end (`yarn && yarn start`).
 
 Useful commands
 ---
