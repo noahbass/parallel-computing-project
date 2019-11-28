@@ -1,7 +1,17 @@
-parallel-computing-project (until we come up with a better name)
+# parallel-computing-project (until we come up with a better name)
+
+## Front-End
+
+See [front-end-visualization/README.md](front-end-visualization/README.md) for getting started with the front-end (`yarn start`).
 
 Useful commands
 ---
+
+Requesting time on the Owens cluster cli: `qsub -I -l nodes=1:ppn=1 -l walltime=00:20:00` (1 node for 20 minutes)
+
+Installing Spark NLP on OSC: `pip install --user --ignore-installed spark-nlp==2.2.2`
+
+Running python code with `spark-submit` on the CLI (`module load spark`): [https://www.osc.edu/resources/available_software/software_list/spark](https://www.osc.edu/resources/available_software/software_list/spark)
 
 Grabbing some reddit comment data: `wget https://files.pushshift.io/reddit/comments/daily/RC_2018-01-01.xz`
 
