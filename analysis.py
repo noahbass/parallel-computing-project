@@ -74,9 +74,10 @@ print('Created UDF')
 result = result.withColumn('sentiment', udf_summarize_sentiment(col('sentiment')))
 result = result.withColumn('sentiment', col('sentiment').cast('integer'))
 
-# TODO: remove rows with a Null/None sentiment value?
-
 print('Ran UDF')
+
+# If analysis could not be performed on a row (sentiment column marked as None/Null), drop that row
+result = result.filter(col('sentiment').isNotNull())
 
 result.printSchema()
 # result.show()
