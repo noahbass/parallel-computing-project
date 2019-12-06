@@ -34,12 +34,14 @@ commentsCleaned = commentsCleaned.filter(commentsCleaned.text != '[deleted]')\
 
 print('Cleaned comments')
 
-# Convert comment text to use utf-8
-def utf8_user_text(text):
-    return text.encode('utf-8')
+# Convert comment text to use ascii text only (this drops some characters from user comments, including international characters)
+def ascii_user_text(text):
+    return text.encode('ascii', 'ignore').decode('ascii')
 
-udf_utf8_user_text = udf(utf8_user_text, StringType())
-commentsCleaned = commentsCleaned.withColumn('text', udf_utf8_user_text(col('text')))
+udf_ascii_user_text = udf(ascii_user_text, StringType())
+commentsCleaned = commentsCleaned.withColumn('text', udf_ascii_user_text(col('text')))
+
+commentsCleaned.show()
 
 # TODO: reddit comments can be written in markdown, should we convert the markdown to plain text before analyzing?
 
@@ -53,26 +55,38 @@ result = pipeline.transform(commentsCleaned)
 result = result.select('subreddit', 'sentiment')
 
 # UDF (user defined function) to get sentiment summary from the full sentiment Array (returns 1, 0, or -1)
-def summarize_sentiment(in_array):
-    # temporary function (TODO: make this actually summarize the sentiment values)
-    if in_array == None or len(in_array) == 0:
-        # TODO: decide if we should throw out rows if there is no body text to be analyzed
-        return None # if there is no sentiment value, return None
-
-    result = in_array[0]['result']
-    if result == 'negative':
-        return -1
-    if result == 'positive':
-        return 1
-    return 0
-
-udf_summarize_sentiment = udf(summarize_sentiment, IntegerType())
-
-print('Created UDF')
-
+def sentiment_sum(in_array):
+    if in_array != None and len(in_array) != 0:
+        if len(in_array) == 0:
+            # only one sentance exists, so take result from first sentance
+            result = in_array[0]['result']
+            
+            if result == 'na':
+                return None
+            elif result == 'positive':
+                return 1
+            else:
+                return -1
+        else:
+            # sum results from all sentances (sum > 0 == positive, sum < 0 == negative, sum == 0 == na)
+            sentiment_sum = 0
+            for sentance in in_array:
+                result = sentance['result']
+            
+                if result == 'positive':
+                    sentiment_sum += 1
+                elif result == 'negative':
+                    sentiment_sum -= 1
+            if sentiment_sum == 0:
+                return None
+            elif sentiment_sum > 0:
+                return 1
+            else:
+                return -1
+    return None
 # Modify the sentiment column to be an integer type of either 1, 0, or -1
-result = result.withColumn('sentiment', udf_summarize_sentiment(col('sentiment')))
-result = result.withColumn('sentiment', col('sentiment').cast('integer'))
+udf_sentiment_sum = udf(sentiment_sum, IntegerType())
+result = result.withColumn('sentiment', udf_sentiment_sum(col('sentiment')))
 
 print('Ran UDF')
 
@@ -86,4 +100,4 @@ result.printSchema()
 # 4. Write to a single csv file
 # Analysis has been done in parallel. Repartition (so we can write to one file), then write the DataFrame to disk.
 # Result is written inside of the `out.csv/` directory.
-result.repartition(1).write.option('header', 'true').csv('out.csv', mode='overwrite')
+# result.repartition(1).write.option('header', 'true').csv('out.csv', mode='overwrite')
