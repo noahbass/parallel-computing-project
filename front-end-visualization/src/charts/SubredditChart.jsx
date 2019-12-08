@@ -12,8 +12,8 @@ const options = {
         text: 'Subreddit Toxicity'
     },
     xAxis: {
-    		// list of subreddits here
-        categories: ['/r/soccer', '/r/gaming', '/r/AskReddit', '/r/baseball', '/r/uCinci', '/r/cincinnati', '/r/trees', '/r/funny', '/r/'],
+    	// list of subreddits here
+        categories: ['/r/soccer', '/r/gaming', '/r/AskReddit', '/r/baseball', '/r/uCinci', '/r/cincinnati', '/r/trees', '/r/funny', '/r/pics'],
         title: {
         	text: 'Subreddits'
         }
@@ -32,7 +32,7 @@ const options = {
         data: [-0.1, 0.432, -0.1843, -0.326, -0.048, 0.013, 0.3, 0.3, -0.4]
     }]
 }
- 
+
 const SubredditChart = () => {
     return <HighchartsReact highcharts={Highcharts} options={options} />
 }
